@@ -1,0 +1,12 @@
+.vs
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+Script/
+Stage/
+BuildFromBat/
+Platforms/
+*.sln
+.vsconfig
+Build/
