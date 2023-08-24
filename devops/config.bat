@@ -14,7 +14,7 @@ set RunUATPath=%EnginePath_4.26_InstallBuild%\Engine\Build\BatchFiles\RunUAT.bat
 
 rem Project params
 set ProjectRoot=D:\Epic Games\_Projects\TPS_Game_4.26
-set ProjectPureName=TPS_Game
+set ProjectPureName=TPS
 set ProjectName=%ProjectPureName%.uproject
 set ProjectPath=%ProjectRoot%\%ProjectName%
 
@@ -26,7 +26,7 @@ set ArchivePath=%ProjectRoot%\Build
 rem Other params
 set SourceCodePath=%ProjectRoot%\Source
 set dirsToRemove=Intermediate DerivedDataCache Saved Binaries .vs Build
-set filesToRemove=*.sln
+set filesToRemove=*.sln .vsconfig
 
 rem Target params
 set COPYRIGHT_LINE=// Copyright EpicGames.

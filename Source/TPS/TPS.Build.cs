@@ -2,12 +2,13 @@
 
 using UnrealBuildTool;
 
-public class TPS_Game : ModuleRules
+public class TPS : ModuleRules
 {
-    public TPS_Game(ReadOnlyTargetRules Target) : base(Target)
+    public TPS(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay" });
+        PublicIncludePaths.Add("TPS");
     }
 }

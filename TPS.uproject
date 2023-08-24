@@ -1,11 +1,11 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{70F05B02-4A4F-0199-02C0-A7A50A0A4230}",
+	"EngineAssociation": "5.2",
 	"Category": "",
 	"Description": "",
 	"Modules": [
 		{
-			"Name": "TPS_Game",
+			"Name": "TPS",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}
