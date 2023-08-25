@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "TPSCharacter.generated.h"
 
+class UTPSInvetoryComponent;
+
 UCLASS(config = Game)
 class ATPSCharacter : public ACharacter
 {
@@ -65,6 +67,10 @@ protected:
     // APawn interface
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
     // End of APawn interface
+
+protected:
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    UTPSInvetoryComponent* InvetoryComponent;
 
 public:
     /** Returns CameraBoom subobject **/
