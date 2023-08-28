@@ -14,6 +14,7 @@ ATPSInvetoryItem::ATPSInvetoryItem()
     CollisionComponent->InitSphereRadius(30.0f);
     CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     CollisionComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+    CollisionComponent->SetGenerateOverlapEvents(true);
     SetRootComponent(CollisionComponent);
 }
 

@@ -10,7 +10,7 @@ set UBTRelativePath5=Engine\Binaries\DotNET\AutomationTool\AutomationTool.exe
 set VersionSelector=C:\Program Files (x86)\Epic Games\Launcher\Engine\Binaries\Win64\UnrealVersionSelector.exe
 
 rem Engine version for packaging
-set RunUATPath=%EnginePath_4.26_InstallBuild%\Engine\Build\BatchFiles\RunUAT.bat
+set RunUATPath=%EnginePath_5.2%\Engine\Build\BatchFiles\RunUAT.bat
 
 rem Project params
 set ProjectRoot=D:\Epic Games\_Projects\TPS_Game_4.26

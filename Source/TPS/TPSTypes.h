@@ -7,9 +7,10 @@
 UENUM(BlueprintType)
 enum class EInvetoryItemType : uint8
 {
-    SPHERE = 0,
-    CUBE,
-    CYLIDER
+    SPHERE = 0 UMETA(DisplayName = "My cool Sphere"),
+    CUBE UMETA(DisplayName = "My cool Cube"),
+    CYLIDER,
+    CONE
 };
 
 USTRUCT(BlueprintType)

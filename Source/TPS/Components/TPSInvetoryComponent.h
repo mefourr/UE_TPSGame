@@ -23,6 +23,9 @@ public:
 protected:
     virtual void BeginPlay() override;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    TMap<EInvetoryItemType, int32> InventoryLimits;
+
 private:
     TMap<EInvetoryItemType, int32> Inventory;
 };

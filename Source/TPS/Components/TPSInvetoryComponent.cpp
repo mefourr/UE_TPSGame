@@ -10,6 +10,19 @@ UTPSInvetoryComponent::UTPSInvetoryComponent()
 void UTPSInvetoryComponent::BeginPlay()
 {
     Super::BeginPlay();
+
+    const UEnum* InvEnum = StaticEnum<EInvetoryItemType>();
+    check(InvEnum);
+
+    for (int32 i = 0; i < InvEnum->NumEnums() - 1; ++i)
+    {
+        const EInvetoryItemType EnumElem = static_cast<EInvetoryItemType>(i);
+
+        const FString EnumElemName = UEnum::GetValueAsString(EnumElem);
+        const bool LimitCheckCond = InventoryLimits.Contains(EnumElem) && InventoryLimits[EnumElem] >= 0;
+
+        checkf(LimitCheckCond, TEXT("Limit for %s doesn't exist or less than zero"), *EnumElemName);
+    }
 }
 
 bool UTPSInvetoryComponent::TryToAddItem(const FInvetoryData& Data)
@@ -21,7 +34,10 @@ bool UTPSInvetoryComponent::TryToAddItem(const FInvetoryData& Data)
         Inventory.Add(Data.Type, 0);
     }
 
-    Inventory[Data.Type] += Data.Score;
+    const auto NextScore = Inventory[Data.Type] + Data.Score;
+    if (NextScore > InventoryLimits[Data.Type]) return false;
+
+    Inventory[Data.Type] = NextScore;
 
     return true;
 }
