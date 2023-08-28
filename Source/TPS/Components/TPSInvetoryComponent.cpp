@@ -11,6 +11,7 @@ void UTPSInvetoryComponent::BeginPlay()
 {
     Super::BeginPlay();
 
+#if !UE_BUILD_SHIPPING
     const UEnum* InvEnum = StaticEnum<EInvetoryItemType>();
     check(InvEnum);
 
@@ -23,6 +24,7 @@ void UTPSInvetoryComponent::BeginPlay()
 
         checkf(LimitCheckCond, TEXT("Limit for %s doesn't exist or less than zero"), *EnumElemName);
     }
+#endif
 }
 
 bool UTPSInvetoryComponent::TryToAddItem(const FInvetoryData& Data)

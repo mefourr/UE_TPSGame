@@ -13,6 +13,15 @@ struct TestPayload
     T2 ExpectedValue;
     float Tolerance = KINDA_SMALL_NUMBER;
 };
+
+#define ENUM_LOOP_START(TYPE, EnumElem)                                                                                                    \
+    const UEnum* InvEnum = StaticEnum<TYPE>();                                                                                             \
+    check(InvEnum);                                                                                                                        \
+    for (int32 i = 0; i < InvEnum->NumEnums() - 1; ++i)                                                                                    \
+    {                                                                                                                                      \
+        const TYPE EnumElem = static_cast<TYPE>(i);
+#define ENUM_LOOP_END }
+
 }  // namespace Test
 
 }  // namespace TPS
