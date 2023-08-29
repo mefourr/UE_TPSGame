@@ -1,4 +1,5 @@
 #pragma once
+#if (WITH_DEV_AUTOMATION_TESTS || WITH_PERF_AUTOMATION_TESTS)
 
 #include "CoreMinimal.h"
 
@@ -14,14 +15,14 @@ struct TestPayload
     float Tolerance = KINDA_SMALL_NUMBER;
 };
 
-#define ENUM_LOOP_START(TYPE, EnumElem)                                                                                                    \
-    const UEnum* InvEnum = StaticEnum<TYPE>();                                                                                             \
-    check(InvEnum);                                                                                                                        \
-    for (int32 i = 0; i < InvEnum->NumEnums() - 1; ++i)                                                                                    \
-    {                                                                                                                                      \
-        const TYPE EnumElem = static_cast<TYPE>(i);
+#define ENUM_LOOP_START(TYPE, EnumElem)                                        \
+    for (int32 index = 0; index < StaticEnum<TYPE>()->NumEnums() - 1; ++index) \
+    {                                                                          \
+        const TYPE EnumElem = static_cast<TYPE>(index);
 #define ENUM_LOOP_END }
 
 }  // namespace Test
 
 }  // namespace TPS
+
+#endif

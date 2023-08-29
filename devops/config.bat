@@ -13,7 +13,7 @@ rem Engine version for packaging
 set RunUATPath=%EnginePath_5.2%\Engine\Build\BatchFiles\RunUAT.bat
 
 rem Project params
-set ProjectRoot=D:\Epic Games\_Projects\TPS_Game_4.26
+set ProjectRoot=D:\Epic Games\_Projects\TPS
 set ProjectPureName=TPS
 set ProjectName=%ProjectPureName%.uproject
 set ProjectPath=%ProjectRoot%\%ProjectName%
