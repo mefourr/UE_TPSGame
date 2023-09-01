@@ -9,7 +9,7 @@
 
 class USphereComponent;
 
-UCLASS()
+UCLASS(Abstract)  // Abstract forbids to spawn
 class TPS_API ATPSInvetoryItem : public AActor
 {
     GENERATED_BODY()
