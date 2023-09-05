@@ -12,11 +12,21 @@
 #include "Components/TextRenderComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Tests/TestUtils.h"
+#include "Misc/OutputDeviceNull.h"
+#include "kismet/GameplayStatics.h"
+#include "TPS/TPSCharacter.h"
+#include "TPS/Components/TPSInvetoryComponent.h"
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FCppAcotrCantBeCreated, "TPSGame.Items.Inventory.CppAcotrCantBeCreated",
     EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FBlueprintShouldBeSetupCorrectrly, "TPSGame.Items.Inventory.BlueprintShouldBeSetupCorrectrly",
+    EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FInventoryDataShouldBeSetupCorrectrly, "TPSGame.Items.Inventory.InventoryDataShouldBeSetupCorrectrly",
+    EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FInventoryCanBeTaken, "TPSGame.Items.Inventory.FInventoryCanBeTaken",
     EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);
 
 /*
@@ -28,6 +38,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FBlueprintShouldBeSetupCorrectrly, "TPSGame.Ite
 namespace
 {
 constexpr char* InventoryItemBPName = "/Script/Engine.Blueprint'/Game/Invetory/BP_TPSInvetoryItem.BP_TPSInvetoryItem'";
+constexpr char* InventoryItemBPTestName = "/Script/Engine.Blueprint'/Game/Tests/BP_Test_TPSInvetoryItem.BP_Test_TPSInvetoryItem'";
 
 }  // namespace
 
@@ -85,6 +96,91 @@ bool FBlueprintShouldBeSetupCorrectrly::RunTest(const FString& Parameters)
     if (!TestNotNull("StaticMesh Component exists", StaticMeshComp)) return false;
 
     TestTrueExpr(StaticMeshComp->GetCollisionEnabled() == ECollisionEnabled::NoCollision);
+
+    return true;
+}
+
+bool FInventoryDataShouldBeSetupCorrectrly::RunTest(const FString& Parameters)
+{
+    LevelScope{"/Game/Tests/EmptyTestLevel"};
+
+    UWorld* World = GetTestGameWorld();
+    if (!TestNotNull("World exists", World)) return false;
+
+    const FTransform InitialTransform{FVector{1000.0f}};
+    ATPSInvetoryItem* InvItem = CreateBlueprint<ATPSInvetoryItem>(World, InventoryItemBPTestName, InitialTransform);
+    if (!TestNotNull("Inventory Item exists", InvItem)) return false;
+
+    FVector Vec{120.f, 130.f, 104.f};
+    CallFuncByNameWithParams(InvItem, "SetTestData",
+        {
+            FString::FromInt(123),                                                    //
+            FString::SanitizeFloat(232.71f),                                          //
+            *FString("\"Suka\""),                                                     //
+            *FString("Yes"),                                                          //
+            *FString::Printf(TEXT("(X=%3.1f,Y=%3.1f,Z=%3.1f)"), Vec.X, Vec.Y, Vec.Z)  //
+        });
+
+    const FInvetoryData InvData{EInvetoryItemType::CYLIDER, 300};
+    const FLinearColor Color = FLinearColor::Red;
+    CallFuncByNameWithParams(InvItem, "SetInventoryData", {InvData.ToString(), Color.ToString()});
+
+    const auto TextRenderComp = InvItem->FindComponentByClass<UTextRenderComponent>();
+    if (!TestNotNull("TextRender Component exists", TextRenderComp)) return false;
+
+    TestTrueExpr(TextRenderComp->Text.ToString().Equals(FString::FromInt(InvData.Score)));
+    TestTrueExpr(TextRenderComp->TextRenderColor == Color.ToFColor(true));
+
+    const auto StaticMeshComp = InvItem->FindComponentByClass<UStaticMeshComponent>();
+    if (!TestNotNull("StaticMesh Component exists", StaticMeshComp)) return false;
+
+    const auto Material = StaticMeshComp->GetMaterial(0);
+    if (!TestNotNull("Material exists", Material)) return false;
+
+    FLinearColor MaterialCOlor;
+    Material->GetVectorParameterValue(FHashedMaterialParameterInfo{"Color"}, MaterialCOlor);
+    TestTrueExpr(MaterialCOlor == Color);
+
+    return true;
+}
+
+bool FInventoryCanBeTaken::RunTest(const FString& Parameters)
+{
+    LevelScope{"/Game/Tests/EmptyTestLevel"};
+
+    UWorld* World = GetTestGameWorld();
+    if (!TestNotNull("World exists", World)) return false;
+
+    const FTransform InitialTransform{FVector{1000.0f}};
+    ATPSInvetoryItem* InvItem = CreateBlueprint<ATPSInvetoryItem>(World, InventoryItemBPTestName, InitialTransform);
+    if (!TestNotNull("Inventory Item exists", InvItem)) return false;
+
+    const FInvetoryData InvData{EInvetoryItemType::CYLIDER, 13};
+    const FLinearColor Color = FLinearColor::Red;
+    CallFuncByNameWithParams(InvItem, "SetInventoryData", {InvData.ToString(), Color.ToString()});
+
+    TArray<AActor*> Pawns;
+    UGameplayStatics::GetAllActorsOfClass(World, ATPSCharacter::StaticClass(), Pawns);
+    if (!TestTrueExpr(Pawns.Num() == 1)) return false;
+
+    const auto Character = Cast<ATPSCharacter>(Pawns[0]);
+    if (!TestNotNull("ATPSCharacter exists", Character)) return false;
+
+    const auto InvComp = Character->FindComponentByClass<UTPSInvetoryComponent>();
+    if (!TestNotNull("UTPSInventoryComponent exists", InvComp)) return false;
+
+    TestTrueExpr(InvComp->GetInventoryAmoundByType(InvData.Type) == 0);
+
+    // character takes inventory item;
+    Character->SetActorLocation(InvItem->GetActorLocation() /*InitialTransform.GetLocation()*/);
+
+    TestTrueExpr(InvComp->GetInventoryAmoundByType(InvData.Type) == InvData.Score);
+
+    TestTrueExpr(!IsValid(InvItem));
+
+    TArray<AActor*> InvItems;
+    UGameplayStatics::GetAllActorsOfClass(World, ATPSInvetoryItem::StaticClass(), InvItems);
+    TestTrueExpr(!InvItems.Num());
 
     return true;
 }

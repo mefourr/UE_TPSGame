@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "Engine/Blueprint.h"
 #include "Tests/AutomationCommon.h"
+#include "Misc/OutputDeviceNull.h"
 
 namespace TPS
 {
@@ -31,6 +32,7 @@ T* CreateBlueprint(UWorld* World, const FString& Name, const FTransform& Transfo
 }
 
 UWorld* GetTestGameWorld();
+void CallFuncByNameWithParams(UObject* Object, const FString& FuncName, const TArray<FString>& Params);
 
 class LevelScope
 {
