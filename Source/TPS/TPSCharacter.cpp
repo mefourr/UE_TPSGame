@@ -8,13 +8,13 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
-//////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////
 #include "Components/TPSInvetoryComponent.h"
-
+#include "TimerManager.h"
 //////////////////////////////////////////////////////////////////////////
-// ATPSCharacter
 
+// ATPSCharacter
 ATPSCharacter::ATPSCharacter()
 {
     // Set size for collision capsule
@@ -56,9 +56,7 @@ ATPSCharacter::ATPSCharacter()
     InvetoryComponent = CreateDefaultSubobject<UTPSInvetoryComponent>("InvetoryComponent");
 }
 
-//////////////////////////////////////////////////////////////////////////
 // Input
-
 void ATPSCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
     // Set up gameplay key bindings
@@ -84,6 +82,61 @@ void ATPSCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInput
 
     // VR headset functionality
     PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ATPSCharacter::OnResetVR);
+}
+
+void ATPSCharacter::BeginPlay()
+{
+    Super::BeginPlay();
+
+    check(MaxHealth > 0.0f);
+    Health = MaxHealth;
+
+    OnTakeAnyDamage.AddDynamic(this, &ATPSCharacter::OnAnyDamage);
+}
+
+float ATPSCharacter::GetHealthPercent() const
+{
+    return Health / MaxHealth;
+}
+
+void ATPSCharacter::OnAnyDamage(
+    AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+{
+    const auto IsAlive = [this]() -> bool { return Health > 0.0f; };
+    if (Damage <= 0.0f || !IsAlive()) return;
+
+    Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
+    GetWorldTimerManager().ClearTimer(HealTImeHandle);
+
+    if (IsAlive())
+    {
+        GetWorldTimerManager().SetTimer(HealTImeHandle, this, &ATPSCharacter::OnHealing, .5f, true, -1.0f);
+    }
+    else
+    {
+        OnDeath();
+    }
+}
+
+void ATPSCharacter::OnHealing()
+{
+
+    Health = FMath::Clamp(Health + 10.0f, 0.0f, MaxHealth);
+    if (FMath::IsNearlyEqual(Health, MaxHealth))
+    {
+        Health = MaxHealth;
+        GetWorldTimerManager().ClearTimer(HealTImeHandle);
+    }
+}
+
+void ATPSCharacter::OnDeath()
+{
+    GetWorldTimerManager().ClearTimer(HealTImeHandle);
+
+    GetCharacterMovement()->DisableMovement();
+    GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+    GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+    GetMesh()->SetSimulatePhysics(true);
 }
 
 void ATPSCharacter::OnResetVR()

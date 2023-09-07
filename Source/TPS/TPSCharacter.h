@@ -7,6 +7,8 @@
 #include "TPSCharacter.generated.h"
 
 class UTPSInvetoryComponent;
+class UDamageType;
+class AController;
 
 UCLASS(config = Game)
 class ATPSCharacter : public ACharacter
@@ -68,13 +70,31 @@ protected:
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
     // End of APawn interface
 
-protected:
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-    UTPSInvetoryComponent* InvetoryComponent;
-
 public:
     /** Returns CameraBoom subobject **/
     FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
     /** Returns FollowCamera subobject **/
     FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+protected:
+    virtual void BeginPlay() override;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    UTPSInvetoryComponent* InvetoryComponent;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Health", meta = (ClampMin = "0"))
+    float MaxHealth{100.0f};
+
+    UFUNCTION(BlueprintCallable, Category = "Health")
+    float GetHealthPercent() const;
+
+private:
+    float Health{0.0f};
+    FTimerHandle HealTImeHandle;
+
+    UFUNCTION()
+    void OnAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
+
+    void OnHealing();
+    void OnDeath();
 };
