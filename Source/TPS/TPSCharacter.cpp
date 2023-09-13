@@ -8,13 +8,11 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
-
-//////////////////////////////////////////////////////////////////////////
 #include "Components/TPSInvetoryComponent.h"
 #include "TimerManager.h"
-//////////////////////////////////////////////////////////////////////////
 
-// ATPSCharacter
+#define FLOAT_NULL 0.0f
+
 ATPSCharacter::ATPSCharacter()
 {
     // Set size for collision capsule
@@ -36,18 +34,17 @@ ATPSCharacter::ATPSCharacter()
     GetCharacterMovement()->AirControl = 0.2f;
 
     // Create a camera boom (pulls in towards the player if there is a collision)
-    CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+    CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoom");
     CameraBoom->SetupAttachment(RootComponent);
     CameraBoom->TargetArmLength = 300.0f;        // The camera follows at this distance behind the character
     CameraBoom->bUsePawnControlRotation = true;  // Rotate the arm based on the controller
 
     // Create a follow camera
-    FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-    FollowCamera->SetupAttachment(CameraBoom,
-        USpringArmComponent::SocketName);           // Attach the camera to the end of the
-                                                    // boom and let the boom adjust to match
-                                                    // the controller orientation
-    FollowCamera->bUsePawnControlRotation = false;  // Camera does not rotate relative to arm
+    FollowCamera = CreateDefaultSubobject<UCameraComponent>("FollowCamera");
+    FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);  // Attach the camera to the end of the
+                                                                                 // boom and let the boom adjust to match
+                                                                                 // the controller orientation
+    FollowCamera->bUsePawnControlRotation = false;                               // Camera does not rotate relative to arm
 
     // Note: The skeletal mesh and anim blueprint references on the Mesh component
     // (inherited from Character) are set in the derived blueprint asset named
@@ -56,7 +53,6 @@ ATPSCharacter::ATPSCharacter()
     InvetoryComponent = CreateDefaultSubobject<UTPSInvetoryComponent>("InvetoryComponent");
 }
 
-// Input
 void ATPSCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
     // Set up gameplay key bindings
@@ -88,29 +84,29 @@ void ATPSCharacter::BeginPlay()
 {
     Super::BeginPlay();
 
-    check(MaxHealth > 0.0f);
-    Health = MaxHealth;
+    check(HealthData.MaxHealth > FLOAT_NULL);
+    Health = HealthData.MaxHealth;
 
     OnTakeAnyDamage.AddDynamic(this, &ATPSCharacter::OnAnyDamage);
 }
 
 float ATPSCharacter::GetHealthPercent() const
 {
-    return Health / MaxHealth;
+    return Health / HealthData.MaxHealth;
 }
 
 void ATPSCharacter::OnAnyDamage(
     AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
-    const auto IsAlive = [this]() -> bool { return Health > 0.0f; };
-    if (Damage <= 0.0f || !IsAlive()) return;
+    const auto IsAlive = [this]() -> bool { return Health > FLOAT_NULL; };
+    if (Damage <= FLOAT_NULL || !IsAlive()) return;
 
-    Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
+    Health = FMath::Clamp(Health - Damage, FLOAT_NULL, HealthData.MaxHealth);
     GetWorldTimerManager().ClearTimer(HealTImeHandle);
 
     if (IsAlive())
     {
-        GetWorldTimerManager().SetTimer(HealTImeHandle, this, &ATPSCharacter::OnHealing, .5f, true, -1.0f);
+        GetWorldTimerManager().SetTimer(HealTImeHandle, this, &ATPSCharacter::OnHealing, HealthData.HealRate, true, HealthData.HealDelay);
     }
     else
     {
@@ -121,10 +117,10 @@ void ATPSCharacter::OnAnyDamage(
 void ATPSCharacter::OnHealing()
 {
 
-    Health = FMath::Clamp(Health + 10.0f, 0.0f, MaxHealth);
-    if (FMath::IsNearlyEqual(Health, MaxHealth))
+    Health = FMath::Clamp(Health + HealthData.HealModyfire, FLOAT_NULL, HealthData.MaxHealth);
+    if (FMath::IsNearlyEqual(Health, HealthData.MaxHealth))
     {
-        Health = MaxHealth;
+        Health = HealthData.MaxHealth;
         GetWorldTimerManager().ClearTimer(HealTImeHandle);
     }
 }
@@ -133,10 +129,21 @@ void ATPSCharacter::OnDeath()
 {
     GetWorldTimerManager().ClearTimer(HealTImeHandle);
 
+    check(GetCharacterMovement());
+    check(GetCapsuleComponent());
+    check(GetMesh());
+
     GetCharacterMovement()->DisableMovement();
     GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
     GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
     GetMesh()->SetSimulatePhysics(true);
+
+    if (Controller)
+    {
+        Controller->ChangeState(NAME_Spectating);
+    }
+
+    SetLifeSpan(HealthData.LifeSpan);
 }
 
 void ATPSCharacter::OnResetVR()
@@ -178,7 +185,7 @@ void ATPSCharacter::LookUpAtRate(float Rate)
 
 void ATPSCharacter::MoveForward(float Value)
 {
-    if ((Controller != nullptr) && (Value != 0.0f))
+    if (Controller && Value != 0.0f)
     {
         // find out which way is forward
         const FRotator Rotation = Controller->GetControlRotation();
@@ -192,7 +199,7 @@ void ATPSCharacter::MoveForward(float Value)
 
 void ATPSCharacter::MoveRight(float Value)
 {
-    if ((Controller != nullptr) && (Value != 0.0f))
+    if (Controller && Value != 0.0f)
     {
         // find out which way is right
         const FRotator Rotation = Controller->GetControlRotation();

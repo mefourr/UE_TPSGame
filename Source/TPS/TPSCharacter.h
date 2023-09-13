@@ -4,24 +4,26 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "TPSTypes.h"
 #include "TPSCharacter.generated.h"
 
 class UTPSInvetoryComponent;
 class UDamageType;
 class AController;
+class USpringArmComponent;
+class UCameraComponent;
+class UInputComponent;
 
 UCLASS(config = Game)
 class ATPSCharacter : public ACharacter
 {
     GENERATED_BODY()
 
-    /** Camera boom positioning the camera behind the character */
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-    class USpringArmComponent* CameraBoom;
+    USpringArmComponent* CameraBoom;
 
-    /** Follow camera */
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-    class UCameraComponent* FollowCamera;
+    UCameraComponent* FollowCamera;
 
 public:
     ATPSCharacter();
@@ -67,14 +69,14 @@ protected:
 
 protected:
     // APawn interface
-    virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+    virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
     // End of APawn interface
 
 public:
     /** Returns CameraBoom subobject **/
-    FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+    FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
     /** Returns FollowCamera subobject **/
-    FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+    FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 protected:
     virtual void BeginPlay() override;
@@ -82,8 +84,8 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     UTPSInvetoryComponent* InvetoryComponent;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Health", meta = (ClampMin = "0"))
-    float MaxHealth{100.0f};
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Health")
+    FHealthData HealthData;
 
     UFUNCTION(BlueprintCallable, Category = "Health")
     float GetHealthPercent() const;

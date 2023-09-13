@@ -26,3 +26,24 @@ struct FInvetoryData
 
     FString ToString() const { return *FString::Printf(TEXT("(Type=%i,Score=%i)"), Type, Score); }
 };
+
+USTRUCT(BlueprintType)
+struct FHealthData
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "1.0"))
+    float MaxHealth{100.0f};
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.1"))
+    float HealModyfire{5.0f};
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.1", Units = "Seconds"))
+    float HealRate{0.5f};
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "-1.0"))
+    float HealDelay{-1.0f};
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Units = "Seconds"))
+    float LifeSpan{5.0f};
+};
