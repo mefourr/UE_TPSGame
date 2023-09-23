@@ -46,4 +46,15 @@ struct FHealthData
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Units = "Seconds"))
     float LifeSpan{5.0f};
+
+    FString ToString() const
+    {
+        return *FString::Printf(TEXT("(MaxHealth=%f,HealModyfire=%f,HealRate=%f,HealDelay=%f,LifeSpan=%f)"),  //
+            MaxHealth,                                                                                        //
+            HealModyfire,                                                                                     //
+            HealRate,                                                                                         //
+            HealDelay,                                                                                        //
+            LifeSpan                                                                                          //
+        );                                                                                                    //
+    }
 };

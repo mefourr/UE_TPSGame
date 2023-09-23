@@ -183,14 +183,14 @@ bool FInventoryCanBeTaken::RunTest(const FString& Parameters)
 
     TArray<AActor*> InvItems;
     UGameplayStatics::GetAllActorsOfClass(World, ATPSInvetoryItem::StaticClass(), InvItems);
-    TestTrueExpr(!InvItems.Num());
+    TestTrueExpr(InvItems.Num() == 0);
 
     return true;
 }
 
 bool FEveryInvntoryMeshExist::RunTest(const FString& Parameters)
 {
-    LevelScope{"/Game/Tests/EmptyTestLevel"};
+    AutomationOpenMap("/Game/Tests/EmptyTestLevel");
 
     UWorld* World = GetTestGameWorld();
     if (!TestNotNull("World exists", World)) return false;

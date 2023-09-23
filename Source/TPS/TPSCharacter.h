@@ -78,6 +78,13 @@ public:
     /** Returns FollowCamera subobject **/
     FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
+    UFUNCTION(BlueprintCallable, Category = "Health" /*, meta = (BlueprintProtected = "true")*/)
+    float GetHealthPercent() const;
+
+    /*
+       float GetHealth() const { return Health; };
+    */
+
 protected:
     virtual void BeginPlay() override;
 
@@ -86,9 +93,6 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Health")
     FHealthData HealthData;
-
-    UFUNCTION(BlueprintCallable, Category = "Health")
-    float GetHealthPercent() const;
 
 private:
     float Health{0.0f};

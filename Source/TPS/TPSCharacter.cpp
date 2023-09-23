@@ -135,12 +135,12 @@ void ATPSCharacter::OnDeath()
 
     GetCharacterMovement()->DisableMovement();
     GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-    GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+    GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
     GetMesh()->SetSimulatePhysics(true);
 
     if (Controller)
     {
-        Controller->ChangeState(NAME_Spectating);
+        Controller->ChangeState(NAME_Spectating);  //  NAME_Playing
     }
 
     SetLifeSpan(HealthData.LifeSpan);
