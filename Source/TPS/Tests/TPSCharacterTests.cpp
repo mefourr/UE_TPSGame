@@ -82,7 +82,18 @@ bool FLatentCommandSimpleWait::RunTest(const FString& Parameters)
     return true;
 }
 
-DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(FTPSLatentLogCommonad, FString, LogMessage);
+// DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(FTPSLatentLogCommonad, FString, LogMessage);
+
+class FTPSLatentLogCommonad : public IAutomationLatentCommand  // instead of the macro above
+{
+public:
+    FTPSLatentLogCommonad(FString InputParam) : LogMessage(InputParam){};
+    virtual ~FTPSLatentLogCommonad(){};
+    virtual bool Update() override;
+
+private:
+    FString LogMessage;
+};
 
 bool FTPSLatentLogCommonad::Update()
 {
@@ -93,10 +104,11 @@ bool FTPSLatentLogCommonad::Update()
 bool FLatentCommandSimpleLog::RunTest(const FString& Parameters)
 {
     UE_LOG(LogTPSCharacterTests, Display, TEXT("Log 1"));
-    ADD_LATENT_AUTOMATION_COMMAND(FTPSLatentLogCommonad{"Latent log 1"});
+    ADD_LATENT_AUTOMATION_COMMAND(FTPSLatentLogCommonad("Latent log 1"));
     UE_LOG(LogTPSCharacterTests, Display, TEXT("Log 2"));
-    ADD_LATENT_AUTOMATION_COMMAND(FTPSLatentLogCommonad{"Latent log 2"});
+    ADD_LATENT_AUTOMATION_COMMAND(FTPSLatentLogCommonad("Latent log 2"));
     UE_LOG(LogTPSCharacterTests, Display, TEXT("Log 3"));
+    ADD_LATENT_AUTOMATION_COMMAND(FTPSLatentLogCommonad("Latent log 3"));
 
     return true;
 }
