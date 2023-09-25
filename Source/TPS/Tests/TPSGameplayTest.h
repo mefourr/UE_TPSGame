@@ -1,0 +1,3 @@
+// Copyright EpicGames.
+
+#pragma once

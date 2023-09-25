@@ -14,7 +14,6 @@
 #include "Components/CapsuleComponent.h"
 #include "kismet/GameplayStatics.h"
 #include "GameFramework/Controller.h"
-// #include "GameFramework/Controller.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogTPSCharacterTests, All, All);
 
