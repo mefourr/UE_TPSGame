@@ -103,7 +103,13 @@ bool FTPSLatentLogCommonad::Update()
 bool FLatentCommandSimpleLog::RunTest(const FString& Parameters)
 {
     UE_LOG(LogTPSCharacterTests, Display, TEXT("Log 1"));
-    ADD_LATENT_AUTOMATION_COMMAND(FTPSLatentLogCommonad("Latent log 1"));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FFunctionLatentCommand(
+        []()
+        {
+            UE_LOG(LogTPSCharacterTests, Display, TEXT("Latent log 1"));
+            return true;
+        }));
     UE_LOG(LogTPSCharacterTests, Display, TEXT("Log 2"));
     ADD_LATENT_AUTOMATION_COMMAND(FTPSLatentLogCommonad("Latent log 2"));
     UE_LOG(LogTPSCharacterTests, Display, TEXT("Log 3"));

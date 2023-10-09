@@ -34,6 +34,57 @@ UWorld* GetTestGameWorld()
     return nullptr;
 }
 
+FTPSUntilCommand::FTPSUntilCommand(TFunction<void()> InCallback, TFunction<void()> InTimeoutCallback, float InTimeout)
+    : Callback(MoveTemp(InCallback)), TimeoutCallback(MoveTemp(InTimeoutCallback)), Timeout(InTimeout)
+{
+}
+
+bool FTPSUntilCommand::Update()
+{
+    const double NewTime = FPlatformTime::Seconds();
+    if (NewTime - StartTime >= Timeout)
+    {
+        TimeoutCallback();
+        return true;
+    }
+
+    Callback();
+    return false;
+}
+
+int32 GetActionBindingIndexByName(UInputComponent* InputComp, const FString& ActionName, const EInputEvent InputEvent)
+{
+    if (!InputComp) return INDEX_NONE;
+    for (int32 i = 0; i < InputComp->GetNumActionBindings(); ++i)
+    {
+        const FInputActionBinding Action = InputComp->GetActionBinding(i);
+        if (Action.GetActionName().ToString().Equals(ActionName) && Action.KeyEvent == InputEvent)
+        {
+            return i;
+        }
+    }
+    return INDEX_NONE;
+}
+
+int32 GetAxisBindingIndexByName(UInputComponent* InputComp, const FString& AxisName)
+{
+    if (!InputComp) return INDEX_NONE;
+
+    const int32 AxisIndex = InputComp->AxisBindings.IndexOfByPredicate(
+        [=](const FInputAxisBinding& AxisBind) { return AxisBind.AxisName.ToString().Equals(AxisName); });
+
+    // for (int32 i = 0; i < InputComp->AxisBindings.Num(); ++i)
+    //{
+    //     if (InputComp->AxisBindings[i].AxisName.ToString().Equals(AxisName))
+    //     {
+    //         return i;
+    //     }
+    // }
+
+    // return INDEX_NONE;
+    return AxisIndex;
+}
+
 }  // namespace Test
 }  // namespace TPS
 #endif
