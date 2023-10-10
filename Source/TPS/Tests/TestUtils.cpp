@@ -71,7 +71,7 @@ int32 GetAxisBindingIndexByName(UInputComponent* InputComp, const FString& AxisN
     if (!InputComp) return INDEX_NONE;
 
     const int32 AxisIndex = InputComp->AxisBindings.IndexOfByPredicate(
-        [=](const FInputAxisBinding& AxisBind) { return AxisBind.AxisName.ToString().Equals(AxisName); });
+        [=](const FInputAxisBinding& AxisBind) -> bool { return AxisBind.AxisName.ToString().Equals(AxisName); });
 
     // for (int32 i = 0; i < InputComp->AxisBindings.Num(); ++i)
     //{
