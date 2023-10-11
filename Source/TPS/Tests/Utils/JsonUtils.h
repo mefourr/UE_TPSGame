@@ -3,13 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TPS/Tests/Utils/InputRecordingUtils.h"
 
-/**
- *
- */
-class TPS_API JsonUtils
+namespace TPS
+{
+namespace Test
+{
+
+class JsonUtils
 {
 public:
-    JsonUtils();
-    ~JsonUtils();
+    static bool WriteInputData(const FString& FileName, const FInputData& InputData);
+    static bool ReadInputData(const FString& FileName, FInputData& InputData);
 };
+
+}  // namespace Test
+}  // namespace TPS

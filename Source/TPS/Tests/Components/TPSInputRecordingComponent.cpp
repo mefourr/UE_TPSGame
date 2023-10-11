@@ -1,29 +1,58 @@
 // My game copyright
 
 #include "Tests/Components/TPSInputRecordingComponent.h"
+#include "Engine/World.h"
+#include "Components/InputComponent.h"
+#include "TPS/Tests/Utils/JsonUtils.h"
 
-// Sets default values for this component's properties
+DEFINE_LOG_CATEGORY_STATIC(LogTPSInputRecording, All, All);
+
+using namespace TPS::Test;
+
 UTPSInputRecordingComponent::UTPSInputRecordingComponent()
 {
-    // Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-    // off to improve performance if you don't need them.
     PrimaryComponentTick.bCanEverTick = true;
-
-    // ...
 }
 
-// Called when the game starts
 void UTPSInputRecordingComponent::BeginPlay()
 {
     Super::BeginPlay();
 
-    // ...
+    check(GetOwner());
+    check(GetWorld());
+    check(GetOwner()->InputComponent);
+
+    InputData.InitialTransform = GetOwner()->GetActorTransform();
+    InputData.Bindings.Add(MakeBindingData());
 }
 
-// Called every frame
+void UTPSInputRecordingComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    Super::EndPlay(EndPlayReason);
+    if (!JsonUtils::WriteInputData(GenerateFilename(), InputData))
+    {
+        UE_LOG(LogTPSInputRecording, Error, TEXT("WriteInputData error"));
+    }
+}
+
 void UTPSInputRecordingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+    InputData.Bindings.Add(MakeBindingData());
+}
 
-    // ...
+FBindingsData UTPSInputRecordingComponent::MakeBindingData() const
+{
+    FBindingsData BindingData;
+    BindingData.WorldTime = GetWorld()->TimeSeconds;
+    for (auto& AxisBinding : GetOwner()->InputComponent->AxisBindings)
+    {
+        BindingData.AxisValues.Add(FAxisData{AxisBinding.AxisName, AxisBinding.AxisValue});
+    }
+    return BindingData;
+}
+
+FString UTPSInputRecordingComponent::GenerateFilename() const
+{
+    return FPaths::GameSourceDir().Append("TPS/Tests/Data/CharacterTestInput.json");
 }

@@ -19,7 +19,7 @@ struct FAxisData
 };
 
 USTRUCT()
-struct FBindigsData
+struct FBindingsData
 {
     GENERATED_USTRUCT_BODY()
 
@@ -38,7 +38,7 @@ struct FInputData
     GENERATED_USTRUCT_BODY()
 
     UPROPERTY()
-    TArray<FBindigsData> Bindings;
+    TArray<FBindingsData> Bindings;
 
     UPROPERTY()
     FTransform InitialTransform;
