@@ -54,5 +54,7 @@ FBindingsData UTPSInputRecordingComponent::MakeBindingData() const
 
 FString UTPSInputRecordingComponent::GenerateFilename() const
 {
-    return FPaths::GameSourceDir().Append("TPS/Tests/Data/CharacterTestInput.json");
+    FString SaveDir = FPaths::ProjectSavedDir();
+    const FString Data = FDateTime::Now().ToString();
+    return SaveDir.Append("/Tests/").Append(FileName).Append("_").Append(Data).Append(".json");
 }

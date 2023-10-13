@@ -23,27 +23,33 @@ bool JsonUtils::WriteInputData(const FString& FileName, const FInputData& InputD
     FString OutputString;
     TSharedRef<TJsonWriter<>> JsonWriter = TJsonWriterFactory<>::Create(&OutputString);
 
+    // MainJsonObject write down to OutputString
     if (!FJsonSerializer::Serialize(MainJsonObject.ToSharedRef(), JsonWriter))
     {
         UE_LOG(LogJsonUtils, Error, TEXT("JSON serialization error"));
         return false;
-    };
+    }
+    // in this place we have json obj as a string
+
     if (!JsonWriter->Close())
     {
         UE_LOG(LogJsonUtils, Error, TEXT("JSON writer close error"));
         return false;
     }
+
     if (!FFileHelper::SaveStringToFile(OutputString, *FileName))
     {
         UE_LOG(LogJsonUtils, Error, TEXT("File saving error [%s]"), *FileName);
         return false;
     }
+
     return true;
 }
 
 bool JsonUtils::ReadInputData(const FString& FileName, FInputData& InputData)
 {
-    TSharedPtr<FJsonObject> MainJsonObject = MakeShareable(new FJsonObject());
+    // TSharedPtr<FJsonObject> MainJsonObject = MakeShareable(new FJsonObject());
+    TSharedPtr<FJsonObject> MainJsonObject;
 
     FString FileContentString;
     if (!FFileHelper::LoadFileToString(FileContentString, *FileName))

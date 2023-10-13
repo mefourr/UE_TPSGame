@@ -152,6 +152,7 @@ public:
         : World(World), InputComp(InputComp), Bindings(Bindings)
     {
     }
+
     virtual bool Update() override
     {
         if (!World || !InputComp) return true;
@@ -161,7 +162,7 @@ public:
             WorldStartTime = World->TimeSeconds;
         }
 
-        if (World->TimeSeconds - WorldStartTime >= Bindings[Index].WorldTime)
+        while (World->TimeSeconds - WorldStartTime >= Bindings[Index].WorldTime)
         {
             for (int32 i = 0; i < InputComp->AxisBindings.Num(); ++i)
             {
@@ -195,7 +196,7 @@ bool FAllItemsAreTakenOnRecordingMovement::RunTest(const FString& Parameters)
     UGameplayStatics::GetAllActorsOfClass(World, ATPSInvetoryItem::StaticClass(), InventroyItems);
     TestTrueExpr(InventroyItems.Num() == 5);
 
-    const FString FIleName = FPaths::GameSourceDir().Append("TPS/Tests/Data/CharacterTestInput.json");
+    const FString FIleName = GetTestDataDir().Append("CharacterTestInput.json");  // FPaths::GameSourceDir().Append(<>);
     FInputData InputData;
     if (!JsonUtils::ReadInputData(FIleName, InputData)) return false;
     if (!TestTrue("InputData is not empty", InputData.Bindings.Num() > 0)) return false;

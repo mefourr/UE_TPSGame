@@ -3,6 +3,7 @@ Binaries/
 DerivedDataCache/
 Intermediate/
 Saved/
+!Saved/Tests/
 Script/
 Stage/
 BuildFromBat/

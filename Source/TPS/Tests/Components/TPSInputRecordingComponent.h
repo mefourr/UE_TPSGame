@@ -19,12 +19,14 @@ protected:
     virtual void BeginPlay() override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+    UPROPERTY(EditAnywhere)
+    FString FileName{"CharacterTestInput"};
+
 public:
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
     FInputData InputData;
-
     FBindingsData MakeBindingData() const;
     FString GenerateFilename() const;
 };
