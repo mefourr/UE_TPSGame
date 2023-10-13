@@ -169,6 +169,20 @@ public:
                 const float AxisValue = Bindings[Index].AxisValues[i].Value;
                 InputComp->AxisBindings[i].AxisDelegate.Execute(AxisValue);
             }
+
+            if (Index > 0)
+            {
+                for (int32 i = 0; i < InputComp->GetNumActionBindings(); ++i)
+                {
+                    const auto ActionValue = Bindings[Index].ActionVlue[i];
+                    const auto PrevActionValue = Bindings[Index - 1].ActionVlue[i];
+                    if (ActionValue.State && ActionValue.State != PrevActionValue.State)
+                    {
+                        InputComp->GetActionBinding(i).ActionDelegate.Execute(ActionValue.key);
+                    }
+                }
+            }
+
             if (++Index >= Bindings.Num()) return true;
         }
         return false;

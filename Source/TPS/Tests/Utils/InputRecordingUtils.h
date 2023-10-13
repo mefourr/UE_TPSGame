@@ -19,6 +19,21 @@ struct FAxisData
 };
 
 USTRUCT()
+struct FActionData
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY()
+    FName Name;
+
+    UPROPERTY()
+    FKey key;
+
+    UPROPERTY()
+    bool State;
+};
+
+USTRUCT()
 struct FBindingsData
 {
     GENERATED_USTRUCT_BODY()
@@ -26,7 +41,8 @@ struct FBindingsData
     UPROPERTY()
     TArray<FAxisData> AxisValues;
 
-    // TODO: ActionData
+    UPROPERTY()
+    TArray<FActionData> ActionVlue;
 
     UPROPERTY()
     float WorldTime{0.0f};
